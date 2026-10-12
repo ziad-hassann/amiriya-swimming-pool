@@ -71,13 +71,21 @@
       url.searchParams.set(key, params[key]);
     });
     url.searchParams.set("_", Date.now());
-    const controller = new AbortController();
-    const timeout = window.setTimeout(function () { controller.abort(); }, 180000);
-    return fetch(url.toString(), {
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    const options = {
       credentials: "omit",
-      referrerPolicy: "no-referrer",
-      signal: controller.signal
-    }).then(function (response) {
+      referrerPolicy: "no-referrer"
+    };
+    if (controller) options.signal = controller.signal;
+    let timeout;
+    const request = new Promise(function (resolve, reject) {
+      timeout = window.setTimeout(function () {
+        if (controller) controller.abort();
+        reject(new Error("Google Sheet connection timed out."));
+      }, 180000);
+      fetch(url.toString(), options).then(resolve, reject);
+    });
+    return request.then(function (response) {
       if (!response.ok) throw new Error("Could not connect to Google Sheet.");
       return response.json();
     }).then(function (response) {
@@ -85,7 +93,13 @@
         throw new Error((response && response.message) || "Google Sheet request failed.");
       }
       return response;
-    }).finally(function () { window.clearTimeout(timeout); });
+    }).then(function (response) {
+      window.clearTimeout(timeout);
+      return response;
+    }, function (error) {
+      window.clearTimeout(timeout);
+      throw error;
+    });
   }
 
   function toLatinDigits(value) {
