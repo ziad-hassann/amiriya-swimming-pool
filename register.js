@@ -25,7 +25,8 @@
   function updateDays() {
     const selected = day.value;
     const count = month.value ? new Date(Number(year.value) || today.getFullYear(), Number(month.value), 0).getDate() : 31;
-    day.replaceChildren(new Option("Day", ""));
+    day.options.length = 0;
+    day.add(new Option("Day", ""));
     for (let value = 1; value <= count; value++) day.add(new Option(String(value), String(value).padStart(2, "0")));
     if (Number(selected) <= count) day.value = selected;
   }
@@ -48,7 +49,7 @@
     else if (!phone.valid) error = phone.message;
     else if (!date.valid || date.iso > birth.max) error = "اختر تاريخ ميلاد صحيحًا لا يتجاوز اليوم.";
     else if (!Object.prototype.hasOwnProperty.call(groups, membership.value)) error = "اختر نوع الاشتراك.";
-    else if (!Number.isFinite(amount) || amount <= 0) error = "اكتب مبلغ اشتراك أكبر من صفر.";
+    else if (!Number.isFinite(amount) || amount <= 0 || Math.abs(amount * 100 - Math.round(amount * 100)) > .00001) error = "اكتب مبلغ اشتراك أكبر من صفر وبحد أقصى رقمين بعد العلامة العشرية.";
     if (error) { WebData.setStatus(status, "error", error); return; }
     submit.disabled = true; get("submitSpinner").classList.remove("hidden"); get("submitLabel").textContent = "جاري التسجيل..."; WebData.setStatus(status, "info", "جاري حفظ بيانات السباح...");
     const url = groupUrl();

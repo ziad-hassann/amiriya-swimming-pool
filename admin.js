@@ -435,13 +435,13 @@
     try {
       const entries = await WebData.listHistory(recordId,currentAdminPassword);
       if (request !== historyRequest || !historyDialog.open) return;
-      content.replaceChildren();
+      while (content.firstChild) content.removeChild(content.firstChild);
       if (!entries.length) { content.textContent = "لا توجد تعديلات مسجلة حتى الآن."; return; }
       entries.forEach(function (entry) {
         const item = document.createElement("section");
         item.className = "history-entry";
         const swimmer = records.find(function (record) { return record.id === entry.record_id; });
-        const stamp = new Intl.DateTimeFormat("ar-EG",{dateStyle:"medium",timeStyle:"short",timeZone:"Africa/Cairo"}).format(new Date(entry.changed_at));
+        const stamp = new Intl.DateTimeFormat("ar-EG",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Africa/Cairo"}).format(new Date(entry.changed_at));
         item.innerHTML = '<div class="history-meta"><strong>' + escapeHtml(swimmer ? swimmer.full_name : entry.record_id) + '</strong><span>' + escapeHtml(stamp) + ' · ' + escapeHtml(entry.actor) + '</span></div><div class="history-columns"><span>البيان</span><span>قبل التعديل</span><span>بعد التعديل</span></div>' + entry.changes.map(function (change) { return '<div class="history-change"><strong>' + escapeHtml(historyLabels[change.field] || change.field) + '</strong><span>' + escapeHtml(String(change.before == null ? "" : change.before)) + '</span><span>' + escapeHtml(String(change.after == null ? "" : change.after)) + '</span></div>'; }).join("");
         content.appendChild(item);
       });
