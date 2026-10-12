@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="ar">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>&#x644;&#x648;&#x62D;&#x629; &#x627;&#x644;&#x625;&#x62F;&#x627;&#x631;&#x629;</title>
+    <link rel="stylesheet" href="experience.css?v=2">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="topbar__inner">
+          <div class="brand">
+            <img class="brand__logo" src="assets/amiriya-logo.jpg" alt="حمام سباحة الأميرية">
+            <div>
+              <p class="brand__title">حمام سباحة مركز شباب الأميرية</p>
+              <p class="brand__subtitle">لوحة الإدارة · الأميرية</p>
+            </div>
+          </div>
+          <a class="nav-link" href="index.html">&#x635;&#x641;&#x62D;&#x629; &#x627;&#x644;&#x62A;&#x633;&#x62C;&#x64A;&#x644;</a>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="panel login-panel" id="loginPanel">
+          <div class="panel__header">
+            <h1>&#x62F;&#x62E;&#x648;&#x644; &#x627;&#x644;&#x625;&#x62F;&#x627;&#x631;&#x629;</h1>
+            <p id="loginDescription">حمام سباحة مركز شباب الأميرية</p>
+          </div>
+          <form class="form" id="loginForm" accept-charset="UTF-8">
+            <label class="field" id="passwordField">
+              <span class="label">&#x643;&#x644;&#x645;&#x629; &#x627;&#x644;&#x633;&#x631;</span>
+              <input class="input" id="adminPassword" type="password" autocomplete="current-password" placeholder="كلمة سر الإدارة" required>
+            </label>
+            <div class="form-actions">
+              <button class="button button--primary" id="loginButton" type="submit">دخول الإدارة</button>
+              <div class="status hidden" id="loginStatus" role="status"></div>
+            </div>
+          </form>
+        </section>
+
+        <section class="hidden" id="dashboard">
+          <div class="admin-header">
+            <div>
+              <h1>&#x627;&#x644;&#x62A;&#x633;&#x62C;&#x64A;&#x644;&#x627;&#x62A;</h1>
+              <p id="lastUpdated">سجل السباحين والاشتراكات</p>
+            </div>
+            <div class="admin-actions">
+              <button class="button button--secondary icon-button" id="refreshButton" type="button" title="تحديث البيانات" aria-label="تحديث البيانات"><i data-lucide="refresh-cw"></i></button>
+              <button class="button button--secondary" id="selectVisibleButton" type="button">&#x62A;&#x62D;&#x62F;&#x64A;&#x62F; &#x627;&#x644;&#x645;&#x639;&#x631;&#x648;&#x636;</button>
+              <button class="button button--secondary" id="clearSelectionButton" type="button">&#x625;&#x644;&#x63A;&#x627;&#x621; &#x627;&#x644;&#x62A;&#x62D;&#x62F;&#x64A;&#x62F;</button>
+              <button class="button button--primary" id="exportButton" type="button"><i data-lucide="download"></i>تحميل المحدد Excel</button>
+              <button class="button" id="exportVisibleButton" type="button">تصدير المعروض Excel</button>
+              <button class="button" id="allHistoryButton" type="button"><i data-lucide="history"></i>سجل التعديلات</button>
+              <button class="button icon-button" id="logoutButton" type="button" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i data-lucide="log-out"></i></button>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat stat--money"><strong id="totalAmount">0</strong><span>إجمالي مبالغ الاشتراكات · جنيه</span></div>
+            <div class="stat">
+              <strong id="totalCount">0</strong>
+              <span>&#x625;&#x62C;&#x645;&#x627;&#x644;&#x64A; &#x627;&#x644;&#x62A;&#x633;&#x62C;&#x64A;&#x644;&#x627;&#x62A;</span>
+            </div>
+            <div class="stat">
+              <strong id="branchesCount">0</strong>
+              <span>أنواع الاشتراك</span>
+            </div>
+            <div class="stat">
+              <strong id="visibleCount">0</strong>
+              <span id="visibleLabel">&#x627;&#x644;&#x645;&#x639;&#x631;&#x648;&#x636; &#x627;&#x644;&#x622;&#x646;</span>
+            </div>
+            <div class="stat">
+              <strong id="selectedCount">0</strong>
+              <span>&#x627;&#x644;&#x645;&#x62D;&#x62F;&#x62F; &#x644;&#x644;&#x62A;&#x62D;&#x645;&#x64A;&#x644;</span>
+            </div>
+          </div>
+
+          <div class="branch-tabs" id="branchTabs" aria-label="&#x62A;&#x635;&#x641;&#x64A;&#x629; &#x62D;&#x633;&#x628; &#x627;&#x644;&#x641;&#x631;&#x639;"></div>
+          <div class="table-toolbar"><label class="field search-field"><span class="label">بحث السباحين</span><input class="input" id="searchInput" type="search" placeholder="اسم السباح أو رقم ولي الأمر"></label><label class="field sort-field"><span class="label">ترتيب السجلات</span><select class="select" id="sortSelect"><option value="newest">الأحدث أولًا</option><option value="oldest">الأقدم أولًا</option><option value="name">الاسم أ - ي</option><option value="amount">الأعلى مبلغًا</option></select></label></div>
+          <div class="status hidden" id="dashboardStatus" role="status"></div>
+
+          <section class="panel table-panel">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="select-cell"><input class="select-checkbox" id="selectVisibleToggle" type="checkbox" aria-label="&#x62A;&#x62D;&#x62F;&#x64A;&#x62F; &#x627;&#x644;&#x645;&#x639;&#x631;&#x648;&#x636;"></th>
+                    <th>اسم السباح</th>
+                    <th>رقم ولي الأمر</th>
+                    <th>&#x62A;&#x627;&#x631;&#x64A;&#x62E; &#x627;&#x644;&#x645;&#x64A;&#x644;&#x627;&#x62F;</th>
+                    <th>السن</th>
+                    <th>نوع الاشتراك</th>
+                    <th>مبلغ الاشتراك (جنيه)</th>
+                    <th>&#x648;&#x627;&#x62A;&#x633;&#x627;&#x628;</th>
+                    <th>&#x62A;&#x627;&#x631;&#x64A;&#x62E; &#x627;&#x644;&#x62A;&#x633;&#x62C;&#x64A;&#x644;</th>
+                    <th>إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="recordsBody"></tbody>
+              </table>
+            </div>
+            <div class="empty hidden" id="emptyState">&#x644;&#x627; &#x62A;&#x648;&#x62C;&#x62F; &#x62A;&#x633;&#x62C;&#x64A;&#x644;&#x627;&#x62A; &#x644;&#x647;&#x630;&#x627; &#x627;&#x644;&#x627;&#x62E;&#x62A;&#x64A;&#x627;&#x631; &#x62D;&#x627;&#x644;&#x64A;&#x64B;&#x627;.</div>
+            <div class="pagination"><span id="pageLabel">0 تسجيل</span><div class="page-buttons"><button class="button" id="prevPage" type="button" title="الصفحة السابقة" aria-label="الصفحة السابقة">→</button><button class="button" id="nextPage" type="button" title="الصفحة التالية" aria-label="الصفحة التالية">←</button></div></div>
+          </section>
+        </section>
+        <footer class="admin-footer" lang="en" dir="ltr">Designed &amp; Developed by Eng. Ziad Hassan</footer>
+      </main>
+    </div>
+
+    <dialog id="editDialog" class="admin-dialog" aria-labelledby="editTitle">
+      <header class="dialog-header"><div><h2 id="editTitle">تعديل بيانات السباح</h2><p id="editRecordName"></p></div><button class="button icon-button" id="closeEdit" type="button" title="إغلاق" aria-label="إغلاق"><i data-lucide="x"></i></button></header>
+      <form id="editForm" class="edit-form">
+        <label class="field"><span class="label">اسم السباح</span><input class="input" id="editName" minlength="3" maxlength="120" required></label>
+        <label class="field"><span class="label">رقم ولي الأمر</span><input class="input" id="editPhone" inputmode="tel" dir="ltr" required></label>
+        <label class="field"><span class="label">تاريخ الميلاد</span><input class="input" id="editBirth" type="date" lang="en" dir="ltr" min="1900-01-01" required></label>
+        <label class="field"><span class="label">نوع الاشتراك</span><select class="select" id="editMembership" required></select></label>
+        <label class="field"><span class="label">مبلغ الاشتراك (جنيه)</span><input class="input" id="editAmount" type="number" min="0.01" step="0.01" inputmode="decimal" required></label>
+        <div class="status hidden" id="editStatus" role="status"></div>
+        <div class="dialog-actions"><button class="button" id="cancelEdit" type="button">إلغاء</button><button class="button button--primary" id="saveEdit" type="submit"><i data-lucide="save"></i>حفظ التعديلات</button></div>
+      </form>
+    </dialog>
+    <dialog id="historyDialog" class="admin-dialog history-dialog" aria-labelledby="historyTitle">
+      <header class="dialog-header"><h2 id="historyTitle">سجل التعديلات</h2><button class="button icon-button" id="closeHistory" type="button" title="إغلاق" aria-label="إغلاق"><i data-lucide="x"></i></button></header>
+      <div id="historyContent" class="history-content" aria-live="polite"></div>
+    </dialog>
+    <script src="admin-config.js"></script>
+    <script src="vendor/lucide.min.js"></script>
+    <script src="interface.js"></script>
+    <script charset="UTF-8" src="config.js?v=amiriya-2"></script>
+    <script charset="UTF-8" src="vendor/xlsx.full.min.js"></script>
+    <script charset="UTF-8" src="shared.js?v=20260515-select"></script>
+    <script charset="UTF-8" src="admin.js?v=20260515-select"></script>
+  </body>
+</html>

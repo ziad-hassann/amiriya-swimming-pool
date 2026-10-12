@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#087c91"><title>حمام سباحة مركز شباب الأميرية</title><link rel="stylesheet" href="experience.css?v=2"></head>
+<body class="simple-page">
+<div class="welcome-screen" id="welcomeScreen" aria-hidden="true"><img src="assets/amiriya-logo.jpg" alt=""><p lang="en" dir="ltr">AMIRIYA SWIMMING POOL</p><h2>أهلًا بيكم في الأميرية</h2><div class="welcome-loader"><span></span></div></div>
+<main class="simple-wrap"><section class="simple-card">
+<header class="simple-header"><img class="simple-logo" src="assets/amiriya-logo.jpg" alt="شعار حمام سباحة الأميرية"><div><span class="eyebrow" lang="en" dir="ltr">AMIRIYA SWIMMING POOL</span><h1>حمام سباحة<br>مركز شباب الأميرية</h1><p>تسجيل بيانات السباحين</p></div></header>
+<div class="registration-progress"><span>بيانات التسجيل</span><span id="progressLabel">0 / 6</span><div class="progress-track"><span id="progressFill"></span></div></div>
+<form class="simple-form" id="registrationForm">
+<h2 class="form-section-title">بيانات السباح</h2>
+<label class="field"><span class="label">اسم السباح</span><input class="input" id="fullName" autocomplete="name" minlength="3" placeholder="اسم السباح بالكامل" required></label>
+<label class="field"><span class="label">رقم تليفون ولي الأمر</span><input class="input" id="phone" autocomplete="tel" inputmode="tel" dir="ltr" placeholder="01012345678" aria-describedby="phoneNote" required><small id="phoneNote">لازم يكون الرقم عليه واتساب.</small></label>
+<div class="field"><span class="label">تاريخ الميلاد</span><div class="date-parts" dir="ltr" lang="en"><select class="select" id="birthDay" aria-label="Day" required><option value="">Day</option></select><select class="select" id="birthMonth" aria-label="Month" required><option value="">Month</option></select><select class="select" id="birthYear" aria-label="Year" required><option value="">Year</option></select></div><input id="birthDate" type="hidden"></div>
+<label class="field"><span class="label">السن</span><input class="input" id="age" readonly placeholder="السن بالسنوات"></label>
+<h2 class="form-section-title">تفاصيل الاشتراك</h2>
+<label class="field"><span class="label">نوع الاشتراك</span><select class="select" id="membershipType" required><option value="">اختر نوع الاشتراك</option></select></label>
+<div class="group-notice hidden" id="groupNotice" aria-live="polite"><div><span class="group-dot" aria-hidden="true"></span><span id="groupLabel"></span></div><a class="button group-link" id="groupLink" target="_blank" rel="noopener noreferrer">الانضمام لجروب واتساب <span aria-hidden="true">↗</span></a></div>
+<label class="field"><span class="label">مبلغ الاشتراك (جنيه مصري)</span><input class="input" id="subscriptionAmount" type="number" min="0.01" step="0.01" inputmode="decimal" required></label>
+<button class="button button--primary simple-submit" id="submitButton" type="submit"><span class="submit-spinner hidden" id="submitSpinner" aria-hidden="true"></span><span id="submitLabel">إرسال النموذج</span><span aria-hidden="true">←</span></button><div class="status hidden" id="formStatus" role="status"></div></form>
+<section class="registration-success hidden" id="successPanel" tabindex="-1" aria-live="polite"><div class="success-check" aria-hidden="true"><span></span></div><h2>تم تسجيل بياناتك بنجاح</h2><p id="successName"></p><p>شكرًا لثقتكم بحمام سباحة مركز شباب الأميرية. نتمنى للسباح كل التوفيق والنجاح.</p><p>كابتن محمد السيد<br><strong>المدير الفني لحمام سباحة مركز شباب الأميرية</strong></p><a class="button group-link" id="successGroupLink" target="_blank" rel="noopener noreferrer">الانضمام لجروب واتساب</a><button class="button" id="newRegistration" type="button">تسجيل سباح آخر</button></section>
+</section><footer class="developer-credit"><span lang="en" dir="ltr">Designed &amp; Developed by <strong>Eng. Ziad Hassan</strong></span></footer></main><script src="config.js"></script><script src="shared.js?v=amiriya-2"></script><script src="register.js?v=amiriya-2"></script></body></html>

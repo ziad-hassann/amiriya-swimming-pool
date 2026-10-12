@@ -1,0 +1,3 @@
+window.AMIRIYA_ADMIN_CONFIG = {
+  LOCAL_PASSWORD_SHA256: ""
+};
