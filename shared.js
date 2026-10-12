@@ -63,7 +63,7 @@
     const apiUrl = getAppsScriptUrl();
 
     if (!hasRemoteApi()) {
-      return Promise.reject(new Error("Apps Script URL is not configured."));
+      return Promise.reject(new Error("التسجيل غير متاح حاليًا. يرجى المحاولة لاحقًا."));
     }
 
     const url = new URL(apiUrl);
@@ -81,16 +81,18 @@
     const request = new Promise(function (resolve, reject) {
       timeout = window.setTimeout(function () {
         if (controller) controller.abort();
-        reject(new Error("Google Sheet connection timed out."));
+        reject(new Error("انتهت مهلة الاتصال. حاول مرة أخرى."));
       }, 180000);
-      fetch(url.toString(), options).then(resolve, reject);
+      fetch(url.toString(), options).then(resolve, function () {
+        reject(new Error("تعذر الاتصال. راجع الإنترنت وحاول مرة أخرى."));
+      });
     });
     return request.then(function (response) {
-      if (!response.ok) throw new Error("Could not connect to Google Sheet.");
-      return response.json();
+      if (!response.ok) throw new Error("تعذر الاتصال. حاول مرة أخرى." );
+      return response.json().catch(function () { throw new Error("تعذر قراءة الرد. حاول مرة أخرى."); });
     }).then(function (response) {
       if (!response || response.ok === false) {
-        throw new Error((response && response.message) || "Google Sheet request failed.");
+        throw new Error((response && response.message) || "تعذر تنفيذ الطلب. حاول مرة أخرى.");
       }
       return response;
     }).then(function (response) {
