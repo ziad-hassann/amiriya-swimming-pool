@@ -66,50 +66,26 @@
       return Promise.reject(new Error("Apps Script URL is not configured."));
     }
 
-    return new Promise(function (resolve, reject) {
-      const callbackName =
-        "__webDataCallback_" + Date.now() + "_" + Math.random().toString(16).slice(2);
-      const script = document.createElement("script");
-      const url = new URL(apiUrl);
-      const timeout = window.setTimeout(function () {
-        cleanup();
-        reject(new Error("Google Sheet connection timed out."));
-      }, 180000);
-
-      function cleanup() {
-        window.clearTimeout(timeout);
-        delete window[callbackName];
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-      }
-
-      window[callbackName] = function (response) {
-        cleanup();
-
-        if (!response || response.ok === false) {
-          reject(new Error((response && response.message) || "Google Sheet request failed."));
-          return;
-        }
-
-        resolve(response);
-      };
-
-      Object.keys(params || {}).forEach(function (key) {
-        url.searchParams.set(key, params[key]);
-      });
-      url.searchParams.set("callback", callbackName);
-      url.searchParams.set("_", Date.now());
-
-      script.onerror = function () {
-        cleanup();
-        reject(new Error("Could not connect to Google Sheet."));
-      };
-
-      script.src = url.toString();
-      script.referrerPolicy = "no-referrer";
-      document.body.appendChild(script);
+    const url = new URL(apiUrl);
+    Object.keys(params || {}).forEach(function (key) {
+      url.searchParams.set(key, params[key]);
     });
+    url.searchParams.set("_", Date.now());
+    const controller = new AbortController();
+    const timeout = window.setTimeout(function () { controller.abort(); }, 180000);
+    return fetch(url.toString(), {
+      credentials: "omit",
+      referrerPolicy: "no-referrer",
+      signal: controller.signal
+    }).then(function (response) {
+      if (!response.ok) throw new Error("Could not connect to Google Sheet.");
+      return response.json();
+    }).then(function (response) {
+      if (!response || response.ok === false) {
+        throw new Error((response && response.message) || "Google Sheet request failed.");
+      }
+      return response;
+    }).finally(function () { window.clearTimeout(timeout); });
   }
 
   function toLatinDigits(value) {
