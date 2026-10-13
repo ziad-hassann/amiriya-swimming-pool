@@ -245,6 +245,19 @@
     return apiRequest(Object.assign({}, params, { admin_password_hash: passwordHash }));
   }
 
+  function deleteRegistration(record, adminPassword, operationId) {
+    if (!hasRemoteApi()) return missingConnection();
+    return adminRequest({action:"delete",record_id:record.id,expected:JSON.stringify(editableSnapshot(record)),operation_id:operationId},adminPassword);
+  }
+  function restoreRegistration(recordId, adminPassword, operationId) {
+    if (!hasRemoteApi()) return missingConnection();
+    return adminRequest({action:"restore",record_id:recordId,operation_id:operationId},adminPassword);
+  }
+  function listTrash(adminPassword) {
+    if (!hasRemoteApi()) return missingConnection();
+    return adminRequest({action:"trash"},adminPassword).then(function (response) { return response.registrations || []; });
+  }
+
   async function updateRegistration(patch, expected, adminPassword, operationId) {
     if (hasRemoteApi()) return adminRequest({ action:"update", payload:JSON.stringify(patch), expected:JSON.stringify(expected), operation_id:operationId }, adminPassword);
     if (!canUseLocalPreview()) return missingConnection();
@@ -327,6 +340,9 @@
   }
 
   window.WebData = {
+    deleteRegistration: deleteRegistration,
+    restoreRegistration: restoreRegistration,
+    listTrash: listTrash,
     membershipGroups: membershipGroups,
     editableSnapshot: editableSnapshot,
     updateRegistration: updateRegistration,

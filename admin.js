@@ -35,6 +35,11 @@
   let operationId = "";
   let saving = false;
   let historyRequest = 0;
+  const deleteDialog = document.getElementById("deleteDialog");
+  const trashDialog = document.getElementById("trashDialog");
+  let deletionTargets = [];
+  let deleting = false;
+  let restoring = false;
   Object.keys(WebData.membershipGroups).forEach(function (name) { document.getElementById("editMembership").add(new Option(name,name)); });
   if (localMode) {
     document.getElementById("loginDescription").textContent = "أدخل كلمة سر الإدارة";
@@ -164,6 +169,14 @@
         "<td>" + escapeHtml(WebData.formatDisplayDate(record.created_at)) + "</td>" +
         '<td><div class="row-actions"><button class="button icon-button" type="button" data-edit="' + escapeHtml(record.id) + '" title="تعديل بيانات السباح" aria-label="تعديل بيانات السباح"><i data-lucide="pencil"></i></button><button class="button icon-button" type="button" data-history="' + escapeHtml(record.id) + '" title="سجل تعديلات السباح" aria-label="سجل تعديلات السباح"><i data-lucide="history"></i></button></div></td>';
 
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "button icon-button button--danger";
+      deleteButton.dataset.delete = record.id;
+      deleteButton.title = "حذف السباح";
+      deleteButton.setAttribute("aria-label", "حذف السباح");
+      deleteButton.innerHTML = '<i data-lucide="trash-2"></i>';
+      row.querySelector(".row-actions").appendChild(deleteButton);
       recordsBody.appendChild(row);
     });
     if (window.lucide) window.lucide.createIcons({ attrs:{width:16,height:16,'stroke-width':1.8} });
@@ -179,6 +192,8 @@
     selectVisibleButton.disabled = visibleIds.length === 0;
     clearSelectionButton.disabled = selectedIds.size === 0;
     exportButton.disabled = selectedIds.size === 0;
+    document.getElementById("deleteSelectedButton").disabled = selectedIds.size === 0 || deleting;
+    document.getElementById("deleteAllButton").disabled = records.length === 0 || deleting;
     selectVisibleToggle.disabled = visibleIds.length === 0;
     selectVisibleToggle.checked = visibleIds.length > 0 && selectedVisibleCount === visibleIds.length;
     selectVisibleToggle.indeterminate = selectedVisibleCount > 0 && selectedVisibleCount < visibleIds.length;
@@ -380,6 +395,8 @@
   });
   exportButton.addEventListener("click", function () { exportExcel(); });
   recordsBody.addEventListener("click", function (event) {
+    const remove = event.target.closest("[data-delete]");
+    if (remove) { askDelete(records.filter(function (record) { return record.id === remove.dataset.delete; })); return; }
     const edit = event.target.closest("[data-edit]");
     const history = event.target.closest("[data-history]");
     if (history) { openHistory(history.dataset.history); return; }
@@ -424,7 +441,7 @@
     } catch (error) { WebData.setStatus(status,"error",error.message || "تعذر حفظ التعديل. حاول مرة أخرى."); }
     finally { saving = false; button.disabled = false; document.getElementById("closeEdit").disabled = false; document.getElementById("cancelEdit").disabled = false; document.querySelectorAll("#editForm input, #editForm select").forEach(function (field) { field.disabled = false; }); }
   });
-  const historyLabels = {full_name:"اسم السباح",phone:"رقم ولي الأمر",birth_date:"تاريخ الميلاد",membership_type:"نوع الاشتراك",subscription_amount:"مبلغ الاشتراك"};
+  const historyLabels = {full_name:"اسم السباح",phone:"رقم ولي الأمر",birth_date:"تاريخ الميلاد",membership_type:"نوع الاشتراك",subscription_amount:"مبلغ الاشتراك",record_status:"حالة التسجيل"};
   async function openHistory(recordId) {
     const request = ++historyRequest;
     const content = document.getElementById("historyContent");
@@ -440,7 +457,7 @@
       entries.forEach(function (entry) {
         const item = document.createElement("section");
         item.className = "history-entry";
-        const swimmer = records.find(function (record) { return record.id === entry.record_id; });
+        const swimmer = records.find(function (record) { return record.id === entry.record_id; }) || {full_name:entry.record_name || entry.record_id};
         const stamp = new Intl.DateTimeFormat("ar-EG",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Africa/Cairo"}).format(new Date(entry.changed_at));
         item.innerHTML = '<div class="history-meta"><strong>' + escapeHtml(swimmer ? swimmer.full_name : entry.record_id) + '</strong><span>' + escapeHtml(stamp) + ' · ' + escapeHtml(entry.actor) + '</span></div><div class="history-columns"><span>البيان</span><span>قبل التعديل</span><span>بعد التعديل</span></div>' + entry.changes.map(function (change) { return '<div class="history-change"><strong>' + escapeHtml(historyLabels[change.field] || change.field) + '</strong><span>' + escapeHtml(String(change.before == null ? "" : change.before)) + '</span><span>' + escapeHtml(String(change.after == null ? "" : change.after)) + '</span></div>'; }).join("");
         content.appendChild(item);
@@ -449,6 +466,77 @@
   }
   document.getElementById("allHistoryButton").addEventListener("click",function () { openHistory(""); });
   document.getElementById("closeHistory").addEventListener("click",function () { historyDialog.close(); });
+  function askDelete(list) {
+    if (deleting || !list.length) return;
+    deletionTargets = list.map(function (record) { return {record:Object.assign({},record),operation:WebData.makeId()}; });
+    document.getElementById("deleteDescription").textContent = list.length === 1 ? "هل تريد حذف السباح «" + list[0].full_name + "»؟" : "هل تريد حذف " + list.length + " تسجيلات؟";
+    WebData.clearStatus(document.getElementById("deleteStatus"));
+    deleteDialog.showModal();
+  }
+  function closeDelete() { if (!deleting) deleteDialog.close(); }
+  document.getElementById("deleteSelectedButton").addEventListener("click",function () { askDelete(getSelectedRecords()); });
+  document.getElementById("deleteAllButton").addEventListener("click",function () { askDelete(records); });
+  document.getElementById("closeDelete").addEventListener("click",closeDelete);
+  document.getElementById("cancelDelete").addEventListener("click",closeDelete);
+  deleteDialog.addEventListener("cancel",function (event) { if (deleting) event.preventDefault(); });
+  document.getElementById("confirmDelete").addEventListener("click",async function () {
+    if (deleting || !deletionTargets.length) return;
+    deleting = true;
+    ["confirmDelete","closeDelete","cancelDelete"].forEach(function (id) { document.getElementById(id).disabled = true; });
+    const status = document.getElementById("deleteStatus");
+    let completed = 0;
+    try {
+      while (deletionTargets.length) {
+        WebData.setStatus(status,"info","جاري الحذف... " + completed + " / " + (completed + deletionTargets.length));
+        const target = deletionTargets[0];
+        await WebData.deleteRegistration(target.record,currentAdminPassword,target.operation);
+        records = records.filter(function (record) { return record.id !== target.record.id; });
+        selectedIds.delete(target.record.id);
+        deletionTargets.shift(); completed++;
+      }
+      activeBranch = "all"; currentPage = 1; render(); deleteDialog.close();
+      WebData.setStatus(dashboardStatus,"success","تم نقل " + completed + " تسجيلات إلى المحذوفات.");
+    } catch (error) {
+      render();
+      WebData.setStatus(status,"error","تم حذف " + completed + " تسجيلات. " + (error.message || "تعذر إكمال الحذف."));
+    } finally {
+      deleting = false;
+      ["confirmDelete","closeDelete","cancelDelete"].forEach(function (id) { document.getElementById(id).disabled = false; });
+      updateSelectionControls(getVisibleRecords(groupByBranch(records)));
+    }
+  });
+  async function loadTrash() {
+    const content = document.getElementById("trashContent"), status = document.getElementById("trashStatus");
+    content.textContent = "جاري تحميل المحذوفات...";
+    WebData.clearStatus(status);
+    try {
+      const items = await WebData.listTrash(currentAdminPassword);
+      content.innerHTML = "";
+      if (!items.length) content.textContent = "لا توجد تسجيلات محذوفة.";
+      items.forEach(function (record) {
+        const row = document.createElement("div"); row.className = "trash-row";
+        row.innerHTML = '<div><strong>' + escapeHtml(record.full_name) + '</strong><small>' + escapeHtml(record.membership_type) + ' · ' + escapeHtml(WebData.formatDisplayDate(record.deleted_at)) + '</small></div>';
+        const button = document.createElement("button"); button.type = "button"; button.className = "button";
+        button.innerHTML = '<i data-lucide="rotate-ccw"></i>استرجاع';
+        button.addEventListener("click",async function () {
+          if (restoring) return;
+          restoring = true; button.disabled = true;
+          WebData.setStatus(status,"info","جاري استرجاع التسجيل...");
+          try {
+            await WebData.restoreRegistration(record.id,currentAdminPassword,WebData.makeId());
+            await loadRecords(); await loadTrash();
+            WebData.setStatus(status,"success","تم استرجاع السباح بنجاح.");
+          } catch (error) { WebData.setStatus(status,"error",error.message || "تعذر الاسترجاع."); }
+          finally { restoring = false; button.disabled = false; }
+        });
+        row.appendChild(button); content.appendChild(row);
+      });
+      if (window.lucide) window.lucide.createIcons({attrs:{width:16,height:16}});
+    } catch (error) { content.textContent = ""; WebData.setStatus(status,"error",error.message || "تعذر تحميل المحذوفات."); }
+  }
+  document.getElementById("trashButton").addEventListener("click",function () { trashDialog.showModal(); loadTrash(); });
+  document.getElementById("closeTrash").addEventListener("click",function () { if (!restoring) trashDialog.close(); });
+  trashDialog.addEventListener("cancel",function (event) { if (restoring) event.preventDefault(); });
   document.getElementById("exportVisibleButton").addEventListener("click", function () { exportExcel(getVisibleRecords(groupByBranch(records))); });
   searchInput.addEventListener("input", function () { currentPage = 1; render(); });
   sortSelect.addEventListener("change", function () { currentPage = 1; render(); });

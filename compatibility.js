@@ -15,6 +15,9 @@
   }
 
   function installDialog(dialog) {
+    if (typeof dialog.open !== 'boolean') {
+      Object.defineProperty(dialog, 'open', { get: function () { return dialog.hasAttribute('open'); } });
+    }
     var backdrop;
     var previousFocus;
     dialog.classList.add('dialog-fallback');

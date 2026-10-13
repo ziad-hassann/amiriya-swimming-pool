@@ -10,7 +10,7 @@
     <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>&#x644;&#x648;&#x62D;&#x629; &#x627;&#x644;&#x625;&#x62F;&#x627;&#x631;&#x629;</title>
-    <link rel="stylesheet" href="experience.css?v=3">
+    <link rel="stylesheet" href="experience.css?v=delete-4">
   </head>
   <body>
     <div class="app-shell">
@@ -58,6 +58,9 @@
               <button class="button button--primary" id="exportButton" type="button"><i data-lucide="download"></i>تحميل المحدد Excel</button>
               <button class="button" id="exportVisibleButton" type="button">تصدير المعروض Excel</button>
               <button class="button" id="allHistoryButton" type="button"><i data-lucide="history"></i>سجل التعديلات</button>
+              <button class="button button--danger" id="deleteSelectedButton" type="button" disabled><i data-lucide="trash-2"></i>حذف المحدد</button>
+              <button class="button button--danger" id="deleteAllButton" type="button" disabled><i data-lucide="trash-2"></i>حذف كل التسجيلات</button>
+              <button class="button" id="trashButton" type="button"><i data-lucide="archive"></i>المحذوفات</button>
               <button class="button icon-button" id="logoutButton" type="button" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i data-lucide="log-out"></i></button>
             </div>
           </div>
@@ -130,13 +133,21 @@
       <header class="dialog-header"><h2 id="historyTitle">سجل التعديلات</h2><button class="button icon-button" id="closeHistory" type="button" title="إغلاق" aria-label="إغلاق"><i data-lucide="x"></i></button></header>
       <div id="historyContent" class="history-content" aria-live="polite"></div>
     </dialog>
-    <script src="compatibility.js?v=1"></script>
+    <dialog id="deleteDialog" class="admin-dialog" aria-labelledby="deleteTitle">
+      <header class="dialog-header"><h2 id="deleteTitle">تأكيد الحذف</h2><button class="button icon-button" id="closeDelete" type="button" aria-label="إغلاق"><i data-lucide="x"></i></button></header>
+      <div class="history-content"><p id="deleteDescription"></p><p>يمكن استرجاع التسجيلات من المحذوفات.</p><div class="status hidden" id="deleteStatus" role="status"></div><div class="dialog-actions"><button class="button" id="cancelDelete" type="button">إلغاء</button><button class="button button--danger" id="confirmDelete" type="button"><i data-lucide="trash-2"></i>تأكيد الحذف</button></div></div>
+    </dialog>
+    <dialog id="trashDialog" class="admin-dialog history-dialog" aria-labelledby="trashTitle">
+      <header class="dialog-header"><h2 id="trashTitle">المحذوفات</h2><button class="button icon-button" id="closeTrash" type="button" aria-label="إغلاق"><i data-lucide="x"></i></button></header>
+      <div class="history-content"><div class="status hidden" id="trashStatus" role="status"></div><div id="trashContent"></div></div>
+    </dialog>
+    <script src="compatibility.js?v=2"></script>
     <script src="admin-config.js"></script>
     <script src="vendor/lucide.min.js"></script>
     <script src="interface.js"></script>
     <script charset="UTF-8" src="config.js?v=amiriya-2"></script>
     <script charset="UTF-8" src="vendor/xlsx.full.min.js"></script>
-    <script charset="UTF-8" src="shared.js?v=mobile-3"></script>
-    <script charset="UTF-8" src="admin.js?v=mobile-3"></script>
+    <script charset="UTF-8" src="shared.js?v=delete-4"></script>
+    <script charset="UTF-8" src="admin.js?v=delete-4"></script>
   </body>
 </html>

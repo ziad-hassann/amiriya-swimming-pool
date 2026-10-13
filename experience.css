@@ -158,4 +158,10 @@ tbody tr.selected td { background:#eef8f7; }
 .dialog-fallback[open] { display:block; position:fixed; top:50%; left:50%; margin:0; transform:translate(-50%,-50%); z-index:101; overflow:auto; animation:none; }
 .dialog-fallback-backdrop { position:fixed; top:0; right:0; bottom:0; left:0; background:#0829368a; z-index:100; }
 .has-dialog-fallback { overflow:hidden; }
+.button--danger { color:var(--red); border-color:#edc9cd; background:#fff5f5; }
+.button--danger:hover:not(:disabled) { background:#ffe8e9; }
+.trash-row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 0; border-bottom:1px solid var(--line); }
+.trash-row > div { min-width:0; overflow-wrap:break-word; }
+.trash-row small { display:block; }
+.trash-row .button { flex:none; }
 @media(max-width:600px) { .simple-wrap { width:calc(100% - 20px); } .search-field { max-width:none; } .date-parts .select { font-size:16px; padding:0 2px; } }
