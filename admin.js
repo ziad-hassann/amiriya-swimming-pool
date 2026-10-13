@@ -521,13 +521,14 @@
         button.addEventListener("click",async function () {
           if (restoring) return;
           restoring = true; button.disabled = true;
+          document.getElementById("closeTrash").disabled = true;
           WebData.setStatus(status,"info","جاري استرجاع التسجيل...");
           try {
             await WebData.restoreRegistration(record.id,currentAdminPassword,WebData.makeId());
             await loadRecords(); await loadTrash();
             WebData.setStatus(status,"success","تم استرجاع السباح بنجاح.");
           } catch (error) { WebData.setStatus(status,"error",error.message || "تعذر الاسترجاع."); }
-          finally { restoring = false; button.disabled = false; }
+          finally { restoring = false; button.disabled = false; document.getElementById("closeTrash").disabled = false; }
         });
         row.appendChild(button); content.appendChild(row);
       });
