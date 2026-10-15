@@ -67,15 +67,18 @@
     }
 
     const url = new URL(apiUrl);
+    const body = new URLSearchParams();
+    const writing = params && params.action === "register";
     Object.keys(params || {}).forEach(function (key) {
-      url.searchParams.set(key, params[key]);
+      (writing ? body : url.searchParams).set(key, params[key]);
     });
-    url.searchParams.set("_", Date.now());
+    if (!writing) url.searchParams.set("_", Date.now());
     const controller = typeof AbortController === "function" ? new AbortController() : null;
     const options = {
       credentials: "omit",
       referrerPolicy: "no-referrer"
     };
+    if (writing) { options.method = "POST"; options.body = body; }
     if (controller) options.signal = controller.signal;
     let timeout;
     const request = new Promise(function (resolve, reject) {
@@ -226,7 +229,7 @@
 
     return apiRequest({
       action: "register",
-      payload: JSON.stringify(record)
+      payload: JSON.stringify({full_name:record.full_name,phone:record.phone,birth_date:record.birth_date,membership_type:record.membership_type,subscription_amount:record.subscription_amount})
     });
   }
 
